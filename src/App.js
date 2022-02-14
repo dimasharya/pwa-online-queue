@@ -1,25 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
+// const Layout = lazy(() => import('./containers/Layout'));
+
+import { useAuth0 } from "@auth0/auth0-react";
+import history from "./utils/history";
+import TheSuspense from './components/TheSuspense';
+
+const TheLayout = lazy(() => import("./containers/TheLayout"))
+const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"))
+
 function App() {
+
+  const { isLoading, error, loginWithRedirect } = useAuth0();
+
+  if (error) {
+    return <div>Oops... {error.message}</div>;
+  }
+
+  if (isLoading) {
+    return <TheSuspense />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Routes history={history}>
+        <Route path="/*" element={<Dashboard />} />
+        <Route path="/app/*" element={<TheLayout />}/>
+        <Route path="/authorize" />
+      </Routes>
   );
 }
 

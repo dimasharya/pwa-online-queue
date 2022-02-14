@@ -1,21 +1,53 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import React, { Suspense } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import reportWebVitals from "./reportWebVitals";
+import "@themesberg/flowbite";
+import { BrowserRouter } from "react-router-dom";
+import TheSuspense from "./components/TheSuspense";
+import { Auth0Provider } from "@auth0/auth0-react";
+import history from "./utils/history";
+import { getConfig } from "./config";
+
+const onRedirectCallback = (appState) => {
+  history.push(
+    appState && appState.returnTo ? appState.returnTo : window.location.pathname
+  );
+};
+
+// Please see https://auth0.github.io/auth0-react/interfaces/auth0_provider.auth0provideroptions.html
+// for a full list of the available properties on the provider
+const config = getConfig();
+
+const providerConfig = {
+  domain: config.domain,
+  clientId: config.clientId,
+  ...(config.audience ? { audience: config.audience } : null),
+  redirectUri: window.location.origin,
+  onRedirectCallback,
+};
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  <Auth0Provider
+    {...providerConfig}
+  >
+    <React.StrictMode>
+      <BrowserRouter>
+        <Suspense fallback={<TheSuspense />}>
+          <App />
+        </Suspense>
+      </BrowserRouter>
+    </React.StrictMode>
+  </Auth0Provider>,
+  document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.unregister();
+serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
