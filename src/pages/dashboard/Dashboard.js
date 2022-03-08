@@ -3,7 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useAuth0 } from "@auth0/auth0-react";
 import TenantCard from "../../components/TenantCard";
-import { getAllTenant } from "../../api/Tenant";
+import { getAllTenant, getTenant } from "../../api/Tenant";
+import Navigation from "../../components/Navigation";
+import { Navigate } from "react-router";
+
+import Logo from "../../assets/svg/logo.svg"
 
 export default function Dashboard(params) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
@@ -21,14 +25,13 @@ export default function Dashboard(params) {
     return () => mounted = false
   },[])
 
-
-  console.log(tenant);
-
   return (
     <div className="bg-gray-200">
       <div className="flex flex-col bg-teal-500 pb-4 rounded-b-xl top-0 w-full fixed">
         <div className="h-16 mb-2 relative">
-          <img className="" src="" alt="logo-img" />
+          <div className="flex justify-center w-full py-3">
+          <img src={Logo} alt="logo-img" />
+          </div>
           {!isAuthenticated && (
             <button
               type="button"
@@ -56,7 +59,11 @@ export default function Dashboard(params) {
       <div className="px-4 pt-32 pb-4">
         <h4 className="my-2 ml-2 text-lg font-semibold">Dokter</h4>
           <div className="grid m-2 flex-col gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
-            <TenantCard />
+            {tenant.length !== 0 ? (
+              tenant.map((item, idx) => {
+                return <TenantCard key={`tenant${idx}`} dataTenant={item} />
+              })
+            ) : ""}
           </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import TheSuspense from './components/TheSuspense';
 
 const TheLayout = lazy(() => import("./containers/TheLayout"))
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"))
+const TicketOrder = lazy(() => import("./pages/user/TicketOrder"))
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
       <Routes history={history}>
         <Route path="/*" element={<Dashboard />} />
         <Route path="/app/*" element={<TheLayout />}/>
+        <Route path='/ticketorder/*' element={<TicketOrder />} />
         <Route path="/authorize" />
       </Routes>
   );

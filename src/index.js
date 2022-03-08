@@ -10,6 +10,7 @@ import TheSuspense from "./components/TheSuspense";
 import { Auth0Provider } from "@auth0/auth0-react";
 import history from "./utils/history";
 import { getConfig } from "./config";
+import "moment/locale/id"
 
 const onRedirectCallback = (appState) => {
   history.push(
