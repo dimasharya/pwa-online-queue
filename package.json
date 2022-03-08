@@ -2,6 +2,7 @@
   "name": "pwa-online-queue",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://dimasharya.github.io/pwa-online-queue/",
   "dependencies": {
     "@auth0/auth0-react": "^1.9.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
