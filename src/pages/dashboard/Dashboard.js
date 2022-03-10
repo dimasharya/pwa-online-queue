@@ -5,16 +5,20 @@ import { useAuth0 } from "@auth0/auth0-react";
 import TenantCard from "../../components/TenantCard";
 import { getAllTenant, getTenant } from "../../api/Tenant";
 import Navigation from "../../components/Navigation";
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import Logo from "../../assets/svg/logo.svg"
+import { useCurrentPath } from "../../utils/useCurrentPath";
 
 export default function Dashboard(params) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
 
+  const navigate = useNavigate()
+
   const [tenant, setTenant] = useState([])
 
   useEffect(() => {
+    //check()
     let mounted = true
     getAllTenant()
     .then(item => {
@@ -25,7 +29,14 @@ export default function Dashboard(params) {
     return () => mounted = false
   },[])
 
+  // function check(){
+  //   const path = useCurrentPath
+  //   //return isAuthenticated ? navigate('app/') : ""
+  //   console.log(path);
+  // }
+
   return (
+    <>
     <div className="bg-gray-200">
       <div className="flex flex-col bg-teal-500 pb-4 rounded-b-xl top-0 w-full fixed">
         <div className="h-16 mb-2 relative">
@@ -67,5 +78,6 @@ export default function Dashboard(params) {
           </div>
       </div>
     </div>
+    </>
   );
 }
