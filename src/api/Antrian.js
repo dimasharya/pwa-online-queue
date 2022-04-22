@@ -3,7 +3,7 @@ import APICALL from "./APICALL";
 import QueryString from "qs";
 import axios from "axios";
 
-const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+const { apiOrigin = "https://paw-online-queue-api.herokuapp.com", audience } = getConfig();
 
 function validationBeforeAntrianPlacement() {}
 
@@ -46,7 +46,7 @@ export function setAntrianBaru(tenantId, data) {
     method: "POST",
     headers: {'content-type' : "application/x-www-form-urlencoded"},
     data: QueryString.stringify(data),
-    url: `http://localhost:3001/api/antrian/${tenantId}`
+    url: `${apiOrigin}/api/antrian/${tenantId}`
   }
   return axios(option).then((res) => console.log(res))
 }

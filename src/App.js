@@ -26,10 +26,9 @@ function App() {
 
   return (
     <Routes history={history}>
-      <Route path="/*" element={<Dashboard />} />
-      <Route path="/app/*" element={<TheLayout />} />
-      <Route path="/ticketorder/*" element={<TicketOrder />} />
-      <Route path="/authorize" />
+      <Route path="/*" element={<TheLayout />} />
+      {/* <Route path="/ticketorder/*" element={<TicketOrder />} /> */}
+      <Route path="/login" />
     </Routes>
   );
 }

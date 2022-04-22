@@ -13,9 +13,10 @@ const MyTicket = lazy(() => import("../pages/user/MyTicket"));
 const MyTicketHistory = lazy(() => import("../pages/user/MyTicketHistory"));
 
 const TheLayout = () => {
+  const {isAuthenticated} = useAuth0()
   return (
     <div className="h-screen bg-gray-200">
-      <Navigation />
+      {isAuthenticated ? <Navigation /> : "" }
       <Main>
         <Routes>
           <Route path="" element={<Dashboard />} />
@@ -30,6 +31,8 @@ const TheLayout = () => {
     </div>
   );
 };
-export default withAuthenticationRequired(TheLayout, {
-  onRedirecting: () => <TheSuspense />,
-});
+// export default withAuthenticationRequired(TheLayout, {
+//   onRedirecting: () => <TheSuspense />,
+// });
+
+export default TheLayout

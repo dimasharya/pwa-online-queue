@@ -41,7 +41,7 @@ export default function TicketCard({ data }) {
     <div className="flex flex-col rounded-xl py-4 px-2 bg-white relative">
       <div className="flex pl-4 pr-2 justify-end items-center">
         <div className="bg-white py-0.5 px-2 rounded-xl text-xs border bg-teal-50 border-teal-500 text-teal-500">
-          Sedang {status}
+          {status}
         </div>
         <button
           className="sm:inline-block text-gray-400 p-1.5  hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 rounded-lg text-sm"

@@ -13,7 +13,7 @@ import { useCurrentPath } from "../../utils/useCurrentPath";
 export default function Dashboard(params) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
 
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
   const [tenant, setTenant] = useState([])
 
@@ -28,12 +28,6 @@ export default function Dashboard(params) {
     })
     return () => mounted = false
   },[])
-
-  // function check(){
-  //   const path = useCurrentPath
-  //   //return isAuthenticated ? navigate('app/') : ""
-  //   console.log(path);
-  // }
 
   return (
     <>

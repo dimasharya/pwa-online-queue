@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import Moment from "react-moment";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function AmbilAntrianCard({
   dataTenant,
@@ -10,10 +11,11 @@ export default function AmbilAntrianCard({
   //onChange,
   submitAntrian,
 }) {
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
   const { nama_tenant, lokasi, waktu_operasional } = dataTenant;
   const { nomor_sekarang, total_antrian, nomor_selesai, estimasi_antrian } =
     dataAntrian;
-    const dateNow = new Date().toISOString().split('T')[0]
+  const dateNow = new Date().toISOString().split("T")[0];
   const [isBuka, setIsBuka] = useState("tutup");
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function AmbilAntrianCard({
 
   function statusBuka() {
     let waktu_buka, waktu_tutup;
-    let thestatus = true
+    let thestatus = true;
     const now = new Date();
     for (let i = 0; i < waktu_operasional.length; i++) {
       const strbuka = waktu_operasional[i].split("-");
@@ -143,14 +145,24 @@ export default function AmbilAntrianCard({
           ) : (
             ""
           )}
-          <button
-            type="button"
-            className="text-white w-full bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-xs px-5 py-2.5 text-center mt-3 disabled:bg-gray-500"
-            onClick={() => submitAntrian()}
-            disabled={isBuka}
-          >
-            Ambil Antrian
-          </button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className="text-white w-full bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-xs px-5 py-2.5 text-center mt-3 disabled:bg-gray-500"
+              onClick={() => submitAntrian()}
+              disabled={isBuka}
+            >
+              Ambil Antrian
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="text-white w-full bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-xs px-5 py-2.5 text-center mt-3 disabled:bg-gray-500"
+              onClick={() => loginWithRedirect()}
+            >
+              Login Untuk Ambil Antrian
+            </button>
+          )}
         </div>
       </div>
     </>

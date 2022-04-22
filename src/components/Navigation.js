@@ -14,28 +14,28 @@ export default function Navigation(params) {
       >
         <div id="tabs" className="flex justify-between text-gray-400">
           <NavLink
-            to="/app/"
+            to="/"
             className={(navData) => navData.isActive ? NavActive : Nav}
           >
             <FontAwesomeIcon icon={faHome} size="lg" />
             <span className="tab tab-home block text-xs">Beranda</span>
           </NavLink>
           <NavLink
-            to="/app/queue"
+            to="/queue"
             className={(navData) => navData.isActive ? NavActive : Nav}
           >
             <FontAwesomeIcon icon={faTicketAlt} size="lg" />
             <span className="tab tab-kategori block text-xs">Antrian Saya</span>
           </NavLink>
           <NavLink
-            to="/app/queuehistory"
+            to="/queuehistory"
             className={(navData) => navData.isActive ? NavActive : Nav}
           >
             <FontAwesomeIcon icon={faHistory} size="lg" />
             <span className="tab tab-whishlist block text-xs">Riwayat</span>
           </NavLink>
           <NavLink
-            to="/app/account"
+            to="/account"
             className={(navData) => navData.isActive ? NavActive : Nav}
           >
             <FontAwesomeIcon icon={faUserCircle} size="lg" />

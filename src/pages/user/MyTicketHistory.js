@@ -25,7 +25,7 @@ export default function MyTicketHistory() {
   return (
     <>
       {ticket ? (
-        <div className="grid mt-10 mx-5 gap-4">
+        <div className="grid sm:grid-cols-1 md:grid-cols-4 mt-10 mx-5 gap-4">
           {ticket.map((item, index) => {
             let idx = `ticket${index}`;
             return <TicketCard key={idx} data={item} />;
