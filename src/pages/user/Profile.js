@@ -12,7 +12,7 @@ const Profile = () => {
 
   return (
     <div className="grid justify-items-center items-center h-screen">
-      <div className="flex w-10/12 flex-col items-center rounded-3xl bg-white p-8">
+      <div className="flex max-w-sm  w-10/12 flex-col items-center rounded-3xl bg-white p-8">
         <img
           className="rounded-full w-48 h-48 my-5 ring-4 ring-gray-200"
           src={user.picture}
