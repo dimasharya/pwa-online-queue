@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
-import imagespiner from "../assets/img/1484.gif"
 
 function TheSuspense() {
   return (

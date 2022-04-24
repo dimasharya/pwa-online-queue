@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
 import Moment from "react-moment";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -141,6 +140,7 @@ export default function AmbilAntrianCard({
               <Moment format="LLLL" locale="id">
                 {estimasi_antrian}
               </Moment>
+              {" WIB"}
             </p>
           ) : (
             ""
@@ -160,7 +160,7 @@ export default function AmbilAntrianCard({
               className="text-white w-full bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-xs px-5 py-2.5 text-center mt-3 disabled:bg-gray-500"
               onClick={() => loginWithRedirect()}
             >
-              Login Untuk Ambil Antrian
+              Masuk Untuk Ambil Antrian
             </button>
           )}
         </div>

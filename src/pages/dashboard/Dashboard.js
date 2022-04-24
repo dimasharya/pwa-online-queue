@@ -3,12 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useAuth0 } from "@auth0/auth0-react";
 import TenantCard from "../../components/TenantCard";
-import { getAllTenant, getTenant } from "../../api/Tenant";
-import Navigation from "../../components/Navigation";
-import { Navigate, useNavigate } from "react-router";
-
+import { getAllTenant } from "../../api/Tenant";
 import Logo from "../../assets/svg/logo.svg"
-import { useCurrentPath } from "../../utils/useCurrentPath";
 
 export default function Dashboard(params) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();

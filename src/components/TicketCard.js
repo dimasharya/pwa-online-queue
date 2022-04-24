@@ -5,7 +5,8 @@ import { useOnClickOutside } from "../utils/useOnClickOutside";
 import Moment from "react-moment";
 import { getTenant } from "../api/Tenant";
 
-export default function TicketCard({ data }) {
+export default function TicketCard({ dataTenant, toggleCancelAntrian, mode }) {
+  const { antrianId, data } = dataTenant;
   const {
     nama,
     nomor_antrian,
@@ -17,33 +18,40 @@ export default function TicketCard({ data }) {
   } = data;
   const [showDropdown, setShowDropdown] = useState(false);
   const [tenant, setTenant] = useState({
-    nama_tenant : "",
-    lokasi : "",
-    jasa : "",
-    hari_operasional : [],
-    waktu_operasional : [],
-    status : "",
-    picture : ""
-  })
+    nama_tenant: "",
+    lokasi: "",
+    jasa: "",
+    hari_operasional: [],
+    waktu_operasional: [],
+    status: "",
+    picture: "",
+  });
 
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
     getTenant(tenant_id).then((res) => {
-      if(mounted){
-        setTenant(res)
+      if (mounted) {
+        setTenant(res);
       }
-    })
-    return () => (mounted = false)
-  }, [])
+    });
+    return () => (mounted = false);
+  }, []);
+
   const menuRef = useRef();
   useOnClickOutside(menuRef, () => setShowDropdown(false));
+
+  function cancelAntrian(){
+    toggleCancelAntrian(antrianId)
+  }
+
   return (
     <div className="flex flex-col rounded-xl py-4 px-2 bg-white relative">
       <div className="flex pl-4 pr-2 justify-end items-center">
         <div className="bg-white py-0.5 px-2 rounded-xl text-xs border bg-teal-50 border-teal-500 text-teal-500">
           {status}
         </div>
-        <button
+        {mode === "aktif" && (
+          <button
           className="sm:inline-block text-gray-400 p-1.5  hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 rounded-lg text-sm"
           type="button"
           onClick={() => setShowDropdown(!showDropdown)}
@@ -57,10 +65,12 @@ export default function TicketCard({ data }) {
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </button>
+        )}
         {showDropdown && (
           <button
             ref={menuRef}
             className="px-6 py-2 text-red-700 bg-white absolute top-12 right-4 text-base shadow-lg rounded focus:bg-gray-50"
+            onClick={cancelAntrian}
           >
             Batal
           </button>
@@ -79,8 +89,8 @@ export default function TicketCard({ data }) {
           <div className="flex items-center bg-teal-50 py-1 px-3 rounded-xl text-xs text-teal-500 gap-2">
             <FontAwesomeIcon icon={faClock} />
             {tenant.waktu_operasional.map((item, idx) => {
-                return <span key={`jam_operasional_tenant${idx}`}>{item}</span>;
-              })}
+              return <span key={`jam_operasional_tenant${idx}`}>{item}</span>;
+            })}
           </div>
         </div>
       </div>
@@ -110,6 +120,7 @@ export default function TicketCard({ data }) {
                   <Moment format="LT" locale="id">
                     {tanggal}
                   </Moment>
+                  {" WIB"}
                 </h3>
               </div>
             </div>

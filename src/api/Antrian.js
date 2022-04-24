@@ -1,11 +1,9 @@
 import { getConfig } from "../config";
 import APICALL from "./APICALL";
-import QueryString from "qs";
 import axios from "axios";
+import QueryString from "qs";
 
 const { apiOrigin = "https://paw-online-queue-api.herokuapp.com", audience } = getConfig();
-
-function validationBeforeAntrianPlacement() {}
 
 export function getAntrianAktif(tenantId, day) {
   return APICALL.get(
@@ -29,6 +27,11 @@ export function getAntrianSelesai(tenantId, day) {
   ).then((res) => res.data);
 }
 
+export function getAntrianBatal(tenantId, day) {
+  return APICALL.get(`/api/antrian/selesai?id=${tenantId}&date=${day}&status=Dibatalkan`
+  ).then((res) => res.data);
+}
+
 export function getExistAntrian(tenantId, userId, day){
   return APICALL.get(`/api/antrian/exist?id=${tenantId}&user_id=${userId}&date=${day}&status=Antri`).then((res) => res.data)
 }
@@ -37,8 +40,12 @@ export function getActiveAntrian(userId){
   return APICALL.get(`/api/antrian/${userId}?status=Antri`).then((res) => res.data)
 }
 
-export function getExpiredAntrian(userId){
-  return APICALL.get(`/api/antrian/${userId}?status=Selesai`).then((res) => res.data)
+export async function getExpiredAntrian(userId){
+  let thedata, thedata1, thedata2
+  await APICALL.get(`/api/antrian/${userId}?status=Selesai`).then((res) => thedata1 = [ ...res.data])
+  await APICALL.get(`/api/antrian/${userId}?status=Dibatalkan`).then((res) => thedata2 = [ ...res.data])
+  thedata = [...thedata1, ...thedata2]
+  return thedata
 }
 
 export function setAntrianBaru(tenantId, data) {
@@ -48,9 +55,14 @@ export function setAntrianBaru(tenantId, data) {
     data: QueryString.stringify(data),
     url: `${apiOrigin}/api/antrian/${tenantId}`
   }
-  return axios(option).then((res) => console.log(res))
+  return axios(option).then((res) => res.data)
 }
 
-export function getMyActiveTicket(userId){
-  return APICALL.get()
+export function setCancelAntrian(antrianId){
+  const option = {
+    method: "PUT",
+    headers: {'content-type' : "application/x-www-form-urlencoded"},
+    url: `${apiOrigin}/api/antrian/cancel?antrianId=${antrianId}`
+  }
+  return axios(option).then((res) => res.data)
 }

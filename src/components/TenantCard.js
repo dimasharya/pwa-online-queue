@@ -2,7 +2,6 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapMarkerAlt, faClock } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
 
 export default function TenantCard({ dataTenant }) {
   const { tenantId, data } = dataTenant;
@@ -15,13 +14,7 @@ export default function TenantCard({ dataTenant }) {
     status,
     picture,
   } = data;
-
-  // function link () {
-  //   let link;
-  //   isAuthenticated ? link = `ticketorder/${tenantId}` : link = `app/ticketorder/${tenantId}`
-  //   return link
-  // }
-
+  
   const link = `ticketorder/${tenantId}`
 
   return (

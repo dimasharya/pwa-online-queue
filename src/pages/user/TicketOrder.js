@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
-import React, { lazy, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   getAntrianAktif,
   getAntrianAll,
@@ -13,13 +13,15 @@ import {
 import { getTenant } from "../../api/Tenant";
 import AmbilAntrianCard from "../../components/AmbilAntrianCard";
 import HeaderNavigation from "../../components/HeaderNavigation";
-import { getConfig } from "../../config";
-import Main from "../../containers/Main";
+import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom";
 //const SuccessGreeting = lazy(() => import("../../components/SuccessGreeting"))
 
 export default function TicketOrder() {
 
   const {user} = useAuth0()
+
+  let navigate = useNavigate()
 
   const [dataTenant, setDataTenant] = useState({
     nama_tenant: "",
@@ -136,11 +138,13 @@ export default function TicketOrder() {
       };
       if(status === "buka"){
         await setAntrianBaru(params.tenantId, data);
+        await toast.success("Anda berhasil mengambil antrian")
+        await navigate("/queue")
       }else{
-        console.log("tutup");
+        toast.error("Dokter saat ini tutup");
       }
     } else {
-      console.log("user sudah antri");
+      toast.error("Anda sudah mengantri")
     }
   }
 
