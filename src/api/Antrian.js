@@ -3,7 +3,8 @@ import APICALL from "./APICALL";
 import axios from "axios";
 import QueryString from "qs";
 
-const { apiOrigin = "https://paw-online-queue-api.herokuapp.com", audience } = getConfig();
+//const { apiOrigin = "https://paw-online-queue-api.herokuapp.com", audience } = getConfig();
+const { apiOrigin = "http://localhost:4000", audience } = getConfig();
 
 export function getAntrianAktif(tenantId, day) {
   return APICALL.get(

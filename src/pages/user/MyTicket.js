@@ -34,7 +34,7 @@ export default function MyTicket() {
       fetchAntrian();
     }
     return () => (mounted = false);
-  }, [ticket]);
+  }, []);
 
   return (
     <>

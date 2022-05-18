@@ -12,24 +12,26 @@ import {
 } from "../../api/Antrian";
 import { getTenant } from "../../api/Tenant";
 import AmbilAntrianCard from "../../components/AmbilAntrianCard";
+import AmbilAntrianSkeleton from "../../components/AmbilAntrianSkeleton";
 import HeaderNavigation from "../../components/HeaderNavigation";
-import toast from "react-hot-toast"
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-//const SuccessGreeting = lazy(() => import("../../components/SuccessGreeting"))
+import { getRekamMedis } from "../../api/RekamMedis";
 
 export default function TicketOrder() {
+  const { user } = useAuth0();
 
-  const {user} = useAuth0()
+  let navigate = useNavigate();
 
-  let navigate = useNavigate()
+  const [isLoading, setLoading] = useState(true);
 
   const [dataTenant, setDataTenant] = useState({
     nama_tenant: "",
     jasa: "",
     lokasi: "",
-    hari_operasional: [],
-    waktu_operasional: [],
-    kuota_antrian: [],
+    hari_operasional: [""],
+    waktu_operasional: [""],
+    kuota_antrian: [""],
     status: "",
     picture: "",
   });
@@ -41,11 +43,35 @@ export default function TicketOrder() {
     estimasi_antrian: "",
   });
 
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      await getTenant(params.tenantId).then((item) => {
+        if (mounted) {
+          setDataTenant(item);
+        }
+      });
+    };
+    fetchData();
+    setLoading(false);
+    return () => (mounted = false);
+  }, []);
+
+  // const dateNow = new Date().toISOString().split("T")[0];
+
   const [tanggalAntri, setTanggalAntri] = useState(
-    moment().format("yyyy-MM-DD")
   );
 
-  const dateNow = new Date().toISOString().split('T')[0]
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAntrian(params.tenantId);
+    };
+    fetchData();
+  }, [tanggalAntri]);
+
+  function onChange(props) {
+    setTanggalAntri(props);
+  }
 
   let params = useParams();
 
@@ -53,7 +79,7 @@ export default function TicketOrder() {
     let waktu_buka,
       waktu_tutup,
       status = "tutup";
-    const now = new Date();
+    const now = new moment().format();
     for (let i = 0; i < dataTenant.waktu_operasional.length; i++) {
       const strbuka = dataTenant.waktu_operasional[i].split("-");
       const strbuka2 = strbuka[0].split(":");
@@ -70,32 +96,10 @@ export default function TicketOrder() {
     return status;
   }
 
-  async function getEstimasi(day) {
-    let estimasi;
-    const waktu = dataTenant.waktu_operasional;
-    const now = new Date();
-    if (antrian.total_antrian === 0) {
-      estimasi = now.setMinutes(now.getMinutes() + 5);
-    } else {
-      await getLastAntrian(params.tenantId, day).then((data) => {
-        if (data.length !== 0) {
-          data.forEach((element) => {
-            estimasi = new Date(element.waktu_estimasi);
-            if(now >= estimasi){
-              estimasi = now.setMinutes(now.getMinutes() + 5);
-            }else{
-              estimasi.setMinutes(estimasi.getMinutes() + 5);
-            }
-          });
-        }
-      });
-    }
-    return estimasi;
-  }
-
   async function getAntrian(tenantId) {
     let nomor, jumlah, selesai, estimasi;
-    await getAntrianAktif(tenantId, dateNow).then((data) => {
+    const dateDay = moment(tanggalAntri).format("yyyy-MM-DD");
+    await getAntrianAktif(tenantId, dateDay).then((data) => {
       if (data.length !== 0) {
         data.forEach((element) => {
           nomor = element.nomor_antrian;
@@ -104,15 +108,14 @@ export default function TicketOrder() {
         nomor = 0;
       }
     });
-    await getAntrianAll(tenantId, dateNow).then((data) => {
+    await getAntrianAll(tenantId, dateDay).then((data) => {
       jumlah = data.length;
     });
-    await getAntrianSelesai(tenantId, dateNow).then((data) => {
+    await getAntrianSelesai(tenantId, dateDay).then((data) => {
       selesai = data.length;
     });
-    estimasi = await getEstimasi(dateNow);
-    await setAntrian({
-      ...antrian,
+    estimasi = await getEstimasi(dateDay, jumlah);
+    return setAntrian({
       nomor_sekarang: nomor,
       total_antrian: jumlah,
       nomor_selesai: selesai,
@@ -120,55 +123,165 @@ export default function TicketOrder() {
     });
   }
 
-  async function ambilAntrian() {
-    await getAntrian(params.tenantId);
-    const exist = await getExistAntrian(params.tenantId, user.email, dateNow)
-    const status = await getIsBuka()
-    if(exist.length < 1 ) {
-      const data = {
-        nomor_antrian: parseInt(antrian.total_antrian) + 1,
-        tanggal: new Date(),
-        tenant_id: params.tenantId,
-        user_id: user.email,
-        nama: user.nickname,
-        waktu_antri: new Date(),
-        waktu_estimasi: new Date(antrian.estimasi_antrian),
-        status: "Antri",
-        media: "Online",
-      };
-      if(status === "buka"){
-        await setAntrianBaru(params.tenantId, data);
-        await toast.success("Anda berhasil mengambil antrian")
-        await navigate("/queue")
-      }else{
-        toast.error("Dokter saat ini tutup");
+  async function getEstimasi(day, jumlah) {
+    let estimasi,
+      waktu = [];
+    // ambil jam opersional
+    await dataTenant.waktu_operasional.map((item, idx) => {
+      let jamwaktu = [];
+      const wkt1 = item.split("-");
+      for (let i = 0; i < wkt1.length; i++) {
+        const wkt2 = wkt1[i].split(":");
+        jamwaktu.push(wkt2[0]);
+      }
+      waktu[idx] = { buka: jamwaktu[0], tutup: jamwaktu[1] };
+    });
+    const dateDay = new Date(day);
+    const today = new Date();
+    if (jumlah === 0) {
+      for (let i = 0; i < waktu.length; i++) {
+        // apabila antrian pada hari ini dan gaada yg antri
+        if (dateDay.getDate() === today.getDate()) {
+          // console.log(`today${i}`);
+          // apabila antrian pada hari ini jam ambil antrian sebelum buka dan gaada yg antri
+          if (today.getHours() < waktu[i].buka) {
+            estimasi = today.setHours(waktu[i].buka, "00", "00");
+            // console.log(
+            //   "render apabila antrian pada hari ini jam ambil antrian sebelum buka dan gaada yg antri"
+            // );
+            // console.log(`sebelum${i}`);
+            break;
+            // apabila antrian pada hari ini jam ambil antrian setelah buka dan gaada yg antri
+          } else if (
+            today.getHours() > waktu[i].buka &&
+            today.getHours() < waktu[i].tutup
+          ) {
+            estimasi = today.setMinutes(today.getMinutes() + 5);
+            // console.log(
+            //   "render apabila antrian pada hari ini jam ambil antrian setelah buka dan gaada yg antri"
+            // );
+            // console.log(`pas${i}`);
+            break;
+          }
+          // else{
+          //   console.log(`today setelah tutup${i}`);
+          // }
+        } else {
+          if (
+            dateDay.getDate() === today.getDate() &&
+            today.getHours() > waktu[i].tutup
+          ) {
+            estimasi = "";
+            break;
+          } else {
+            estimasi = dateDay.setHours(waktu[i].buka, "00", "00");
+            // console.log(
+            //   "render apabila antrian bukan hari ini jam ambil antrian sebelum buka dan gaada yg antri"
+            // );
+            // console.log(`hari lain${i}`);
+            break;
+          }
+        }
       }
     } else {
-      toast.error("Anda sudah mengantri")
+      // apabila terdapat antrian
+      await getLastAntrian(params.tenantId, day).then((data) => {
+        if (data.length !== 0) {
+          data.forEach((element) => {
+            const est = new Date(element.waktu_estimasi);
+            for (let i = 0; i < waktu.length; i++) {
+              // apabila antri hari ini dan waktu antri melebihi jam antrian terakhir
+              if (dateDay.getDate() === today.getDate()) {
+                if (today.getHours() < waktu[i].buka) {
+                  // console.log(
+                  //   "render terdapat antrian dan waktu ambil sebelum jam antri terakhir"
+                  // );
+                  estimasi = dateDay.setHours(waktu[i].buka, "00", "00");
+                  break;
+                } else if (today.getHours() > waktu[i].buka) {
+                  // console.log(
+                  //   "render terdapat antrian dan waktu ambil hari ini melebihi jam antri terakhir"
+                  // );
+                  estimasi = today.setMinutes(today.getMinutes() + 5);
+                  break;
+                } else {
+                  est.setMinutes(est.getMinutes() + 5);
+                  estimasi = est;
+                  // console.log("render ada antrian dan antri sebelum");
+                }
+              } else {
+                est.setMinutes(est.getMinutes() + 5);
+                estimasi = est;
+                // console.log("render ada antrian dan antri sebelum");
+              }
+              // console.log(`render iterasi ${i}`);
+            }
+          });
+        }
+      });
     }
+    return estimasi;
   }
 
-  useEffect(() => {
-    let mounted = true;
-    getTenant(params.tenantId).then((item) => {
-      if (mounted) {
-        setDataTenant(item);
+  async function ambilAntrian() {
+    await getAntrian(params.tenantId);
+    let exist;
+    await getExistAntrian(params.tenantId, user.email, tanggalAntri).then(
+      (res) => {
+        res.length !== 0 ? (exist = true) : (exist = false);
       }
-    });
-    getAntrian(params.tenantId);
-    return () => (mounted = false);
-  }, []);
+    );
+    //const status = await getIsBuka()
+    const dataRekam = await getRekamMedis(user.email);
+
+    if (dataRekam) {
+      let dataRekamMedis;
+      await getRekamMedis(user.email).then((res) => (dataRekamMedis = res));
+      if (exist === false) {
+        const data = {
+          nomor_antrian: parseInt(antrian.total_antrian) + 1,
+          tanggal: moment(tanggalAntri).format(),
+          tenant_id: params.tenantId,
+          user_id: user.email,
+          nama: dataRekamMedis.nama,
+          alamat: dataRekamMedis.alamat,
+          no_telepon: dataRekamMedis.no_telepon,
+          nomor_rekam: dataRekamMedis.nomor_rekam,
+          waktu_antri: moment(antrian.estimasi_antrian).format(),
+          waktu_estimasi: moment(antrian.estimasi_antrian).format(),
+          status: "Antri",
+          media: "Online",
+        };
+        // if(status === "buka"){
+        await setAntrianBaru(params.tenantId, data);
+        await toast.success("Anda berhasil mengambil antrian");
+        await navigate("/queue");
+        // }else{
+        //   toast.error("Dokter saat ini tutup");
+        // }
+      } else {
+        await toast.error("Anda sudah mengantri");
+      }
+    } else {
+      await toast.error("Lengkapi diri anda dahulu");
+      await navigate("/account");
+    }
+  }
 
   return (
     <>
       <HeaderNavigation namaTenant={dataTenant.nama_tenant} />
       <div className="flex mt-16 mx-1 justify-center">
-        <AmbilAntrianCard
-          dataTenant={dataTenant}
-          dataAntrian={antrian}
-          // onChange={onChange}
-          submitAntrian={ambilAntrian}
-        />
+        {isLoading ? (
+          <AmbilAntrianSkeleton />
+        ) : (
+          <AmbilAntrianCard
+            dataTenant={dataTenant}
+            dataAntrian={antrian}
+            onChange={onChange}
+            submitAntrian={ambilAntrian}
+          />
+        )}
       </div>
     </>
   );

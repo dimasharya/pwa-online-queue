@@ -118,7 +118,7 @@ export default function TicketCard({ dataTenant, toggleCancelAntrian, mode }) {
                 <p className="text-xs">Jam</p>
                 <h3 className=" leading-tight font-semibold">
                   <Moment format="LT" locale="id">
-                    {tanggal}
+                    {waktu_estimasi}
                   </Moment>
                   {" WIB"}
                 </h3>

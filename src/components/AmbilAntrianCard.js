@@ -3,42 +3,78 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import Moment from "react-moment";
 import { useAuth0 } from "@auth0/auth0-react";
+import moment from "moment";
 
 export default function AmbilAntrianCard({
   dataTenant,
   dataAntrian,
-  //onChange,
+  onChange,
   submitAntrian,
 }) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
   const { nama_tenant, lokasi, waktu_operasional } = dataTenant;
   const { nomor_sekarang, total_antrian, nomor_selesai, estimasi_antrian } =
     dataAntrian;
-  const dateNow = new Date().toISOString().split("T")[0];
-  const [isBuka, setIsBuka] = useState("tutup");
+  // const dateNow = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    statusBuka();
+  let waktu = [];
+  let dateMin;
+  dataTenant.waktu_operasional.map((item, idx) => {
+    let jamwaktu = [], minwaktu = [];
+    const wkt1 = item.split("-");
+    for (let i = 0; i < wkt1.length; i++) {
+      const wkt2 = wkt1[i].split(":");
+      jamwaktu.push(wkt2[0]);
+      minwaktu.push(wkt2[1])
+    }
+    waktu[idx] = { bukajam: jamwaktu[0], bukamin: minwaktu[0], tutupjam: jamwaktu[1], tutupmin: minwaktu[0] };
   });
 
-  function statusBuka() {
-    let waktu_buka, waktu_tutup;
-    let thestatus = true;
-    const now = new Date();
-    for (let i = 0; i < waktu_operasional.length; i++) {
-      const strbuka = waktu_operasional[i].split("-");
-      const strbuka2 = strbuka[0].split(":");
-      waktu_buka = new Date();
-      waktu_buka.setHours(strbuka2[0], strbuka2[1], "00");
-      const strtutup = strbuka[1].split(":");
-      waktu_tutup = new Date();
-      waktu_tutup.setHours(strtutup[0], strtutup[1], "00");
-      if (waktu_buka <= now && waktu_tutup > now) {
-        thestatus = false;
-        break;
+  const today = new Date()
+
+    for (let i = 0; i < waktu.length; i++) {
+      const time = new Date()
+      time.setHours(waktu[i].tutupjam)
+      time.setMinutes(waktu[i].tutupmin)
+      if(today > time){
+        const date = new Date()
+        date.setDate(date.getDate() + 1)
+        dateMin = date.toISOString().slice(0, 10)
+      }else{
+        dateMin = moment().format("yyyy-MM-DD")
       }
     }
-    setIsBuka(thestatus);
+
+  //const dateNow = moment().format("yyyy-MM-DD")
+
+  //const [isBuka, setIsBuka] = useState("tutup");
+
+  // useEffect(() => {
+  //   statusBuka();
+  // });
+
+  // function statusBuka() {
+  //   let waktu_buka, waktu_tutup;
+  //   let thestatus = true;
+  //   const now = new Date();
+  //   for (let i = 0; i < waktu_operasional.length; i++) {
+  //     const strbuka = waktu_operasional[i].split("-");
+  //     const strbuka2 = strbuka[0].split(":");
+  //     waktu_buka = new Date();
+  //     waktu_buka.setHours(strbuka2[0], strbuka2[1], "00");
+  //     const strtutup = strbuka[1].split(":");
+  //     waktu_tutup = new Date();
+  //     waktu_tutup.setHours(strtutup[0], strtutup[1], "00");
+  //     if (waktu_buka <= now && waktu_tutup > now) {
+  //       thestatus = false;
+  //       break;
+  //     }
+  //   }
+  //   setIsBuka(thestatus);
+  // }
+
+  function onChangeHandle (props) {
+    onChange(props.target.value)
   }
 
   return (
@@ -79,10 +115,8 @@ export default function AmbilAntrianCard({
                   type="date"
                   id="small-input"
                   className="block px-3 py-2 w-full text-gray-600 text-sm font-semibold rounded-lg border border-gray-300 sm:text-xs focus:border-opacity-0 focus:ring-4 focus:ring-gray-300"
-                  defaultValue={dateNow}
-                  min={dateNow}
-                  max={dateNow}
-                  // onChange={(val) => onChange(val)}
+                  min={dateMin}
+                  onChange={onChangeHandle}
                 />
               </div>
             </form>
@@ -134,7 +168,7 @@ export default function AmbilAntrianCard({
               </>
             )}
           </div>
-          {estimasi_antrian !== "" && isBuka === false ? (
+          {estimasi_antrian !== "" ? (
             <p className="mt-4 text-gray-500 text-xs">
               Estimasi waktu anda mendapat pelayanan pada{" "}
               <Moment format="LLLL" locale="id">
@@ -150,7 +184,6 @@ export default function AmbilAntrianCard({
               type="button"
               className="text-white w-full bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-xs px-5 py-2.5 text-center mt-3 disabled:bg-gray-500"
               onClick={() => submitAntrian()}
-              disabled={isBuka}
             >
               Ambil Antrian
             </button>

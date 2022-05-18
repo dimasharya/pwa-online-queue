@@ -4,8 +4,9 @@ import { getConfig } from "../config";
 import TheSuspense from "../components/TheSuspense";
 
 export const Api = () => {
-  const { apiOrigin = "http://localhost:3001", audience } = getConfig();
-
+  //const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+  const { apiOrigin = "http://localhost:4000", audience } = getConfig();
+  
   const [state, setState] = useState({
     showResult: false,
     apiMessage: "",
