@@ -56,7 +56,7 @@ export default function TicketOrder() {
     estimasi_antrian: "",
   });
 
-  const dateNow = moment().format("yyyy-MM-DD") //new Date().toISOString().slice(0, 10)
+  const dateNow = moment().format("yyyy-MM-DD"); //new Date().toISOString().slice(0, 10)
 
   const [tanggalAntri, setTanggalAntri] = useState(dateNow);
 
@@ -76,7 +76,7 @@ export default function TicketOrder() {
 
   const onChange = (props) => {
     return setTanggalAntri(props);
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,12 +110,14 @@ export default function TicketOrder() {
 
   async function getAntrian(tenantId) {
     let nomor, jumlah, selesai, estimasi;
-    const dateDay = tanggalAntri
+    const dateDay = tanggalAntri;
     await getAntrianAktif(tenantId, dateDay).then((data) => {
       if (data.length !== 0) {
         data.forEach((element) => {
-          nomor = element.data.nomor_antrian
+          nomor = element.data.nomor_antrian;
         });
+      } else if (jumlah > 0) {
+        nomor = jumlah;
       } else {
         nomor = 0;
       }
