@@ -2,6 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+// import { useEffectOnlyOnUpdate } from "../../utils/useEffectOnlyOnUpdate";
 import {
   getAntrianAktif,
   getAntrianAll,
@@ -17,6 +18,18 @@ import HeaderNavigation from "../../components/HeaderNavigation";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { getRekamMedis } from "../../api/RekamMedis";
+
+export const useEffectOnlyOnUpdate = (callback, dependencies) => {
+  const didMount = React.useRef(false);
+
+  React.useEffect(() => {
+    if (didMount.current) {
+      callback(dependencies);
+    } else {
+      didMount.current = true;
+    }
+  }, [callback, dependencies]);
+};
 
 export default function TicketOrder() {
   const { user } = useAuth0();
@@ -43,6 +56,10 @@ export default function TicketOrder() {
     estimasi_antrian: "",
   });
 
+  const dateNow = moment().format("yyyy-MM-DD") //new Date().toISOString().slice(0, 10)
+
+  const [tanggalAntri, setTanggalAntri] = useState(dateNow);
+
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -57,21 +74,16 @@ export default function TicketOrder() {
     return () => (mounted = false);
   }, []);
 
-  // const dateNow = new Date().toISOString().split("T")[0];
-
-  const [tanggalAntri, setTanggalAntri] = useState(
-  );
+  const onChange = (props) => {
+    return setTanggalAntri(props);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       await getAntrian(params.tenantId);
     };
-    fetchData();
+    return fetchData();
   }, [tanggalAntri]);
-
-  function onChange(props) {
-    setTanggalAntri(props);
-  }
 
   let params = useParams();
 
@@ -98,11 +110,11 @@ export default function TicketOrder() {
 
   async function getAntrian(tenantId) {
     let nomor, jumlah, selesai, estimasi;
-    const dateDay = moment(tanggalAntri).format("yyyy-MM-DD");
+    const dateDay = tanggalAntri
     await getAntrianAktif(tenantId, dateDay).then((data) => {
       if (data.length !== 0) {
         data.forEach((element) => {
-          nomor = element.nomor_antrian;
+          nomor = element.data.nomor_antrian
         });
       } else {
         nomor = 0;
@@ -240,7 +252,7 @@ export default function TicketOrder() {
       if (exist === false) {
         const data = {
           nomor_antrian: parseInt(antrian.total_antrian) + 1,
-          tanggal: moment(tanggalAntri).format(),
+          tanggal: moment(tanggalAntri).format("yyyy-MM-DD"),
           tenant_id: params.tenantId,
           user_id: user.email,
           nama: dataRekamMedis.nama,

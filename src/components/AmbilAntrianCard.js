@@ -116,6 +116,7 @@ export default function AmbilAntrianCard({
                   id="small-input"
                   className="block px-3 py-2 w-full text-gray-600 text-sm font-semibold rounded-lg border border-gray-300 sm:text-xs focus:border-opacity-0 focus:ring-4 focus:ring-gray-300"
                   min={dateMin}
+                  defaultValue={moment().format("yyyy-MM-DD")}
                   onChange={onChangeHandle}
                 />
               </div>
