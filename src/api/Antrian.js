@@ -4,7 +4,7 @@ import axios from "axios";
 import QueryString from "qs";
 
 //const { apiOrigin = "https://paw-online-queue-api.herokuapp.com", audience } = getConfig();
-const { apiOrigin = "http://localhost:4000", audience } = getConfig();
+const { apiOrigin = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_API_URL : process.env.REACT_APP_DEV_API_URL, audience } = getConfig();
 
 export function getAntrianAktif(tenantId, day) {
   return APICALL.get(
