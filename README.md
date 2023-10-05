@@ -1,3 +1,3 @@
 PWA ONLINE QUEUE PROJECT
 
-live : https://antrimedika-hrrsnm3fn-dimasharya.vercel.app/
+live : https://antrimedika-dhj00i58g-dimasharya.vercel.app/
